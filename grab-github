@@ -87,7 +87,7 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
           doc["Key"] = key
           doc["Id"] = id
           doc["URL"] = url_base + '/commit/' + id
-          doc["ParentId"] = parent_id
+          doc["ParentId"] = parent_id if parent_id
         end
       end
 
