@@ -16,14 +16,21 @@ ARGV.each do |arg|
   args[k] = v or ""
 end
 
+mc_addr = 'localhost:11211'
+mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
+
+mc = Dalli::Client.new(mc_addr, :serializer => JSON)
+
 def version(x)
   return 0 if x.nil?
   x.xpath("property[@name='version']").text.to_i
 end
 
-def populate_mc(xml)
+def populate_mc(mc, fname, entities_xml)
+  print "filename: #{fname}\n"
+
   m = {} # Instances by class.
-  x = Nokogiri::XML(xml)
+  x = Nokogiri::XML(entities_xml)
   objects = x.xpath("//object")
   objects.each do |object|
     c = object['class']
@@ -38,18 +45,38 @@ def populate_mc(xml)
     end
   end
 
-  m["Page"].keys.sort.each do |page_title|
+  page_titles = m["Page"].keys.sort
+  print "  pages total: #{page_titles.length}\n"
+  page_titles.each do |page_title|
     page_x = m["Page"][page_title]
+    page_id = page_x.xpath("id[@name='id']").text
     creatorName = page_x.xpath("property[@name='creatorName']").text
     creationDate = page_x.xpath("property[@name='creationDate']").text
     lastModifierName = page_x.xpath("property[@name='lastModifierName']").text
     lastModificationDate = page_x.xpath("property[@name='lastModificationDate']").text
     bodyContentId = page_x.xpath("collection[@name='bodyContents']/element[@class='BodyContent']/id[@name='id']").text
     bodyContent = m["BodyContent"][bodyContentId].xpath("property[@name='body']").text
-    p page_title, version(page_x), creatorName, creationDate, lastModifierName, lastModificationDate, bodyContent
+
+    key = "confluence/" + page_title
+    doc = {
+      "Type" => "page",
+      "Key" => key,
+      "Title" => page_title,
+      "Id" => page_id,
+      "CreatorName" => creatorName,
+      "CreationDate" => creationDate,
+      "LastModifierName" => lastModifierName,
+      "LastModificationDate" => lastModificationDate,
+      "BodyContent" => bodyContent
+    }
+
+    ok = mc.set(key, doc)
+    if not ok
+      exit "mc.set failed"
+    end
   end
 end
 
 Dir.glob("./data/confluence/*/entities.xml") do |fname|
-  populate_mc(File.read(fname))
+  populate_mc(mc, fname, File.read(fname))
 end
