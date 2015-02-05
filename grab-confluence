@@ -40,9 +40,13 @@ def populate_mc(xml)
 
   m["Page"].keys.sort.each do |page_title|
     page_x = m["Page"][page_title]
+    creatorName = page_x.xpath("property[@name='creatorName']").text
+    creationDate = page_x.xpath("property[@name='creationDate']").text
+    lastModifierName = page_x.xpath("property[@name='lastModifierName']").text
+    lastModificationDate = page_x.xpath("property[@name='lastModificationDate']").text
     bodyContentId = page_x.xpath("collection[@name='bodyContents']/element[@class='BodyContent']/id[@name='id']").text
     bodyContent = m["BodyContent"][bodyContentId].xpath("property[@name='body']").text
-    p page_title, bodyContent, version(page_x)
+    p page_title, version(page_x), creatorName, creationDate, lastModifierName, lastModificationDate, bodyContent
   end
 end
 
