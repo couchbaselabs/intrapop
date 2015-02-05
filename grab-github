@@ -3,7 +3,6 @@
 # Grab data from github into the data subdirectory and populate the
 # couchbase bucket with the latest commits.
 
-require 'rubygems'
 require 'cgi'
 require 'dalli'
 require 'fileutils'
