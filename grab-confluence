@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # Grab data from confluence into the data subdirectory and populate the
 # couchbase bucket with the latest updates.
