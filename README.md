@@ -39,6 +39,25 @@ And, at least ruby 1.9.3...
   gem install dalli
   gem install octokit
 
+To get leveldb...
+
+    git clone https://github.com/google/leveldb.git
+    cd leveldb/
+    make
+    cp --preserve=links libleveldb.* /usr/local/lib
+    cp -r include/leveldb /usr/local/include/
+    ldconfig
+
+Before staring cbft, use...
+
+    export LD_LIBRARY_PATH=/usr/local/lib
+
+When creating a bleve index in cbft, you can use a store that looks like...
+
+    "store": {
+      "kvStoreName": "leveldb"
+    }
+
 To start cbft...
 
   cd ~/go/src/github.com/couchbaselabs/cbft
