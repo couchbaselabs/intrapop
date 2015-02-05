@@ -82,10 +82,11 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
           # TODO: Do we need to reformat dates?
           doc[field] = val.strip
         else
-          commit_id, parent_id = field.split(' ')
-          key = repo_name + '/' + commit_id
-          doc["CommitId"] = commit_id
-          doc["CommitURL"] = url_base + '/commit/' + commit_id
+          id, parent_id = field.split(' ')
+          key = repo_name + '/' + id
+          doc["Key"] = key
+          doc["Id"] = id
+          doc["URL"] = url_base + '/commit/' + id
           doc["ParentId"] = parent_id
         end
       end
