@@ -15,12 +15,13 @@ ARGV.each do |arg|
   args[k] = v or ""
 end
 
-skip_clone    = args["--skip-clone"]
-skip_pull     = args["--skip-pull"]
-skip_populate = args["--skip-populate"] # Populate the memcached/couchbase server.
-
 orgs = ['couchbase', 'couchbaselabs', 'blevesearch']
 orgs = (args['--orgs'] or "").split(',') if args.include?('--orgs')
+
+skip_clone      = args.include?("--skip-clone")      # Whether to 'git clone'.
+skip_pull       = args.include?("--skip-pull")       # Whether to 'git pull'.
+skip_populate   = args.include?("--skip-populate")   # Whether to populate couchbase.
+full_repopulate = args.include?("--full-repopulate") # Whether to do incremental populate.
 
 mc_addr = 'localhost:11211'
 mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
@@ -53,7 +54,7 @@ end
 
 # -----------------------------------------------------------------------------
 
-def populate_mc_from_dir(mc, dir)
+def populate_mc_from_dir(mc, dir, full_repopulate)
   url = CGI.unescape(File.basename(dir)) # Ex: "https://github.com/couchbase/sigar.git".
   print "#{url}\n"
 
@@ -92,7 +93,12 @@ def populate_mc_from_dir(mc, dir)
       doc["Message"] = msg.strip
 
       if key
-        if not mc.add(key, doc)
+        if full_repopulate
+          ok = mc.set(key, doc)
+        else
+          ok = mc.add(key, doc)
+        end
+        if not ok
           return commits.length, i, key # Return the key that already exists.
         end
 
@@ -109,7 +115,7 @@ end
 mc = Dalli::Client.new(mc_addr, :serializer => JSON)
 
 Dir.glob("./data/github/*") do |dir|
-  commits_total, commits_added, stopped_on_commit = populate_mc_from_dir(mc, dir)
+  commits_total, commits_added, stopped_on_commit = populate_mc_from_dir(mc, dir, full_repopulate)
   print "  commits_total: #{commits_total}\n"
   print "  commits_added: #{commits_added}\n"
   print "  stopped_on_commit: #{stopped_on_commit}\n"
