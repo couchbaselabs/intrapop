@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+# Grab data from confluence into the data subdirectory and populate the
+# couchbase bucket with the latest updates.
+
+require 'cgi'
+require 'dalli'
+require 'json'
+require 'fileutils'
+require 'uri'
+require 'nokogiri'
+
+args = {}
+ARGV.each do |arg|
+  k, v = arg.split('=')
+  args[k] = v or ""
+end
+
+def version(x)
+  return 0 if x.nil?
+  x.xpath("property[@name='version']").text.to_i
+end
+
+def populate_mc(xml)
+  m = {} # Instances by class.
+  x = Nokogiri::XML(xml)
+  objects = x.xpath("//object")
+  objects.each do |object|
+    c = object['class']
+    instances = m[c]
+    instances = {} unless instances
+    m[c] = instances
+
+    id = object.xpath("property[@name='title']").text
+    id = object.xpath("./id[@name='id']").text if id.empty?
+    if version(object) >= version(instances[id])
+      instances[id] = object
+    end
+  end
+
+  m["Page"].keys.sort.each do |page_title|
+    page_x = m["Page"][page_title]
+    bodyContentId = page_x.xpath("collection[@name='bodyContents']/element[@class='BodyContent']/id[@name='id']").text
+    bodyContent = m["BodyContent"][bodyContentId].xpath("property[@name='body']").text
+    p page_title, bodyContent, version(page_x)
+  end
+end
+
+Dir.glob("./data/confluence/*/entities.xml") do |fname|
+  populate_mc(File.read(fname))
+end
