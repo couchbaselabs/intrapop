@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 
+# Grab data from github into the data subdirectory and populate the
+# couchbase bucket with the latest commits.
+
 require 'cgi'
 require 'dalli'
 require 'json'
@@ -19,14 +22,17 @@ skip_populate = args["--skip-populate"] # Populate the memcached/couchbase serve
 orgs = ['couchbase', 'couchbaselabs', 'blevesearch']
 orgs = (args['--orgs'] or "").split(',') if args.include?('--orgs')
 
-# ------------------------------------------------------
+mc_addr = 'localhost:11211'
+mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
+
+# -----------------------------------------------------------------------------
 
 # Clone and pull repositories.
 
 orgs.each do |org|
   # TODO: What about private repos?
 
-  p "curl https://api.github.com/orgs/#{org}/repos"
+  print "curl https://api.github.com/orgs/#{org}/repos\n"
   repos = %x"curl https://api.github.com/orgs/#{org}/repos"
 
   j = JSON.parse(repos)
@@ -35,49 +41,76 @@ orgs.each do |org|
     url = repo['clone_url']  # Ex: "https://github.com/couchbase/sigar.git".
     dir = "./data/github/#{CGI.escape(url)}"
     if not File.exists?(dir + '/.git') and not skip_clone
-      p "git clone #{url} #{dir}"
+      print "git clone #{url} #{dir}\n"
       %x"git clone #{url} #{dir}"
     end
     if File.exists?(dir + '/.git') and not skip_pull
-      p "cd #{dir} && git pull"
+      print "cd #{dir} && git pull\n"
       %x"cd #{dir} && git pull"
     end
   end
 end
 
-# For each repository, grab the logs.
+# -----------------------------------------------------------------------------
 
-Dir.glob("./data/github/*") do |dir|
+def populate_mc_from_dir(mc, dir)
   url = CGI.unescape(File.basename(dir)) # Ex: "https://github.com/couchbase/sigar.git".
-  p url
+  print "#{url}\n"
 
   url_base = url.sub(/\.git$/, '')       # Ex: "https://github.com/couchbase/sigar".
-  p url_base
+  repo_name = url_base.sub("https://github.com/", "") # Ex: "couchbase/sigar".
 
-  p "cd #{dir} && git log"
+  print "cd #{dir} && git log\n"
   lines = %x"cd #{dir} && git log --date-order --format=fuller --parents"
 
   # The otp repo has some non-UTF-8 chars in it that would otherwise lead
   # to error of "`split': invalid byte sequence in UTF-8 (ArgumentError)".
   commits = lines.force_encoding("iso-8859-1").split(/^commit /)
+
+  i = 0
   commits.each do |commit|
-    p commit
     unless commit.empty?
-      doc = {}
+      key = nil
+      doc = { "Type" => "commit", "RepoName" => repo_name }
+
       hdr, msg = commit.split(/\n\n/)
       fields = hdr.split(/\n/)
       fields.each do |field_val|
         field, val = field_val.split(': ')
         if val
+          # TODO: Do we need to reformat dates?
           doc[field] = val.strip
         else
-          commitId, parentId = field.split(' ')
-          doc["CommitId"] = commitId
-          doc["ParentId"] = parentId
+          commit_id, parent_id = field.split(' ')
+          key = repo_name + '/' + commit_id
+          doc["CommitId"] = commit_id
+          doc["CommitURL"] = url_base + '/commit/' + commit_id
+          doc["ParentId"] = parent_id
         end
       end
+
       doc["Message"] = msg.strip
-      p doc
+
+      if key
+        if not mc.add(key, doc)
+          return commits.length, i, key # Return the key that already exists.
+        end
+
+        i = i + 1
+      end
     end
   end
+
+  return commits.length, i, nil
+end
+
+# For each repository, grab the commit logs and populate into mc.
+
+mc = Dalli::Client.new(mc_addr, :serializer => JSON)
+
+Dir.glob("./data/github/*") do |dir|
+  commits_total, commits_added, stopped_on_commit = populate_mc_from_dir(mc, dir)
+  print "  commits_total: #{commits_total}\n"
+  print "  commits_added: #{commits_added}\n"
+  print "  stopped_on_commit: #{stopped_on_commit}\n"
 end
