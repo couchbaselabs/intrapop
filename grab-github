@@ -5,8 +5,9 @@
 
 require 'cgi'
 require 'dalli'
-require 'json'
 require 'fileutils'
+require 'json'
+require 'octokit'
 require 'uri'
 
 args = {}
@@ -30,26 +31,36 @@ mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
 
 # Clone and pull repositories.
 
-orgs.each do |org|
+def clone_pull_org(gclient, org, skip_clone, skip_pull)
+  print "org: #{org}\n"
+
   # TODO: What about private repos?
+  repos = gclient.repositories(org)
+  print "  repos count: #{repos.length}\n"
 
-  print "curl https://api.github.com/orgs/#{org}/repos\n"
-  repos = %x"curl https://api.github.com/orgs/#{org}/repos"
-
-  j = JSON.parse(repos)
-
-  j.each do |repo|
-    url = repo['clone_url']  # Ex: "https://github.com/couchbase/sigar.git".
-    dir = "./data/github/#{CGI.escape(url)}"
-    if not File.exists?(dir + '/.git') and not skip_clone
-      print "git clone #{url} #{dir}\n"
-      %x"git clone #{url} #{dir}"
-    end
-    if File.exists?(dir + '/.git') and not skip_pull
-      print "cd #{dir} && git pull\n"
-      %x"cd #{dir} && git pull"
-    end
+  repos.each do |repo|
+    url = repo[:clone_url] # Ex: "https://github.com/couchbase/sigar.git".
+    clone_pull_repo(url, skip_clone, skip_pull)
   end
+end
+
+def clone_pull_repo(url, skip_clone, skip_pull)
+  dir = "./data/github/#{CGI.escape(url)}"
+  if not File.exists?(dir + '/.git') and not skip_clone
+    print "  git clone #{url} #{dir}\n"
+    %x"git clone #{url} #{dir}"
+  end
+  if File.exists?(dir + '/.git') and not skip_pull
+    print "  cd #{dir} && git pull\n"
+    %x"cd #{dir} && git pull"
+  end
+end
+
+Octokit.auto_paginate = true
+gclient = Octokit::Client.new
+
+orgs.each do |org|
+  clone_pull_org(gclient, org, skip_clone, skip_pull)
 end
 
 # -----------------------------------------------------------------------------
