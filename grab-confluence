@@ -19,6 +19,8 @@ end
 mc_addr = 'localhost:11211'
 mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
 
+# -----------------------------------------------------------------------------
+
 mc = Dalli::Client.new(mc_addr, :serializer => JSON)
 
 def version(x)
