@@ -83,7 +83,7 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
   commits.each do |commit|
     unless commit.empty?
       key = nil
-      doc = { "Type" => "commit", "RepoName" => repo_name }
+      doc = { "Type" => "github/commit", "RepoName" => repo_name }
 
       hdr, msg = commit.split(/\n\n/)
       fields = hdr.split(/\n/)

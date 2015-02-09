@@ -59,7 +59,7 @@ def populate_mc(mc, fname, entities_xml)
 
     key = "confluence/" + page_title
     doc = {
-      "Type" => "page",
+      "Type" => "confluence/page",
       "Key" => key,
       "Title" => page_title,
       "Id" => page_id,
