@@ -31,6 +31,8 @@ end
 def populate_mc(mc, fname, entities_xml)
   print "filename: #{fname}\n"
 
+  space_key = File.basename(File.dirname(fname)).split('-')[0]
+
   m = {} # Instances by class.
   x = Nokogiri::XML(entities_xml)
   objects = x.xpath("//object")
@@ -67,6 +69,7 @@ def populate_mc(mc, fname, entities_xml)
       "Title" => page_title,
       "Id" => page_id,
       "SpaceId" => space_id,
+      "SpaceKey" => space_key,
       "CreatorName" => creatorName,
       "CreationDate" => creationDate,
       "LastModifierName" => lastModifierName,
