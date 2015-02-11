@@ -17,28 +17,24 @@
       {{hit.title}}
     </a>
 
-    <span class="badgeScore pull-right">{{hit.roundedScore}}</span>
-    <span class="badgeScore pull-right">{{hit.fields.type}}</span>
-
-    <div class="panel panel-default">
+    <div class="panel">
       <div class="panel-heading">
+        <span class="badgeScore pull-right">{{hit.fields.type}}</span>
+        <span class="pull-right">
+          {{hit.fields.author}}
+          {{hit.fields.creatorName}}
+          &nbsp;
+        </span>
         <a href="{{hit.url}}">{{hit.url}}</a>
-        {{hit.fields.author}}
-        {{hit.fields.creatorName}}
-        {{hit.fields.name}}
-        <pre>{{hit.fields.title}}{{hit.fields.message}}{{hit.fields.bodyContent}}</pre>
       </div>
+
+      <pre>{{hit.fields.name}}{{hit.fields.title}}{{hit.fields.message}}{{hit.fields.bodyContent}}</pre>
 
       <div class="panel-body">
         <div ng-repeat="(fieldName, fragments) in hit.fragments">
           <div ng-repeat="fragment in fragments" ng-bind-html="fragment"></div>
         </div>
       </div>
-    </div>
-
-    <div class="well" ng-show="explainScoring">
-      Explanation
-      <ul><li><span ng-bind-html="hit.explanationStringSafe"></span></li></ul>
     </div>
   </div>
 </div>
