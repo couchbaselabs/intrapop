@@ -76,56 +76,55 @@ func buildMapping() *bleve.IndexMapping {
 	kw.Analyzer = "keyword"
 
 	m := bleve.NewDocumentMapping()
+	m.AddFieldMappingsAt("type", kw)
+
+	mapping := bleve.NewIndexMapping()
+	mapping.TypeField = "type"
+	mapping.DefaultMapping = m
+	mapping.DefaultAnalyzer = "en"
 
 	// From github/commit...
-	m.AddFieldMappingsAt("Type", kw)
-	m.AddFieldMappingsAt("RepoName", kw)
-	m.AddFieldMappingsAt("Id", kw)
-	m.AddFieldMappingsAt("ParentId", kw)
-	m.AddFieldMappingsAt("URL", kw)
-	m.AddFieldMappingsAt("Author", en)
-	m.AddFieldMappingsAt("Date", en)
-	m.AddFieldMappingsAt("Message", en)
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
+	m.AddFieldMappingsAt("type", kw)
+	m.AddFieldMappingsAt("repo", kw)
+	m.AddFieldMappingsAt("id", kw)
+	m.AddFieldMappingsAt("parentId", kw)
+	m.AddFieldMappingsAt("url", kw)
+	// author, authorDate, commit, commitDate, message
+	mapping.TypeMapping["github/commit"] = m
 
 	// From confluence/page...
-	m.AddFieldMappingsAt("Type", kw)
-	m.AddFieldMappingsAt("Key", kw)
-	m.AddFieldMappingsAt("Title", en)
-	m.AddFieldMappingsAt("Id", kw)
-	m.AddFieldMappingsAt("SpaceKey", kw)
-	m.AddFieldMappingsAt("CreatorName", en)
-	m.AddFieldMappingsAt("CreationDate", en)
-	m.AddFieldMappingsAt("LastModifierName", en)
-	m.AddFieldMappingsAt("LastModifierDate", en)
-	m.AddFieldMappingsAt("BodyContent", en)
-
-	// From beer-sample...
-	m.AddFieldMappingsAt("name", en)
-	m.AddFieldMappingsAt("description", en)
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
 	m.AddFieldMappingsAt("type", kw)
-	m.AddFieldMappingsAt("updated", kw)
-
-	// From beer-sample/brewery...
-	m.AddFieldMappingsAt("city", en)
-	m.AddFieldMappingsAt("state", kw)
-	m.AddFieldMappingsAt("country", kw)
-	m.AddFieldMappingsAt("phone", kw)
-	m.AddFieldMappingsAt("website", kw)
-	m.AddFieldMappingsAt("address", en)
-	// geo / accuracy,lat,lon
+	m.AddFieldMappingsAt("key", kw)
+	m.AddFieldMappingsAt("id", kw)
+	m.AddFieldMappingsAt("spaceKey", kw)
+	// title, creatorName, creationDate, bodyContent,
+	// lastModifierName, lastModificationDate
+	mapping.TypeMapping["confluence/page"] = m
 
 	// From beer-sample/beer...
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
+	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("abv", kw)
 	m.AddFieldMappingsAt("ibu", kw)
 	m.AddFieldMappingsAt("srm", kw)
 	m.AddFieldMappingsAt("upc", kw)
 	m.AddFieldMappingsAt("brewery_id", kw)
-	m.AddFieldMappingsAt("style", kw)
-	m.AddFieldMappingsAt("category", kw)
+	// name, description, updated, style, category
+	mapping.TypeMapping["beer"] = m
 
-	mapping := bleve.NewIndexMapping()
-	mapping.DefaultMapping = m
-	mapping.DefaultAnalyzer = "en"
+	// From beer-sample/brewery...
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
+	m.AddFieldMappingsAt("type", kw)
+	// name, description, updated
+	// city, state, country, phone, website, address
+	// geo / accuracy, lat, lon
+	mapping.TypeMapping["brewery"] = m
 
 	return mapping
 }
