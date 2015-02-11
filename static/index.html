@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <title>intrapop search</title>
+  <meta name="description" content="">
+  <link href="/static/css/prism.css" rel="stylesheet"/>
+  <link href="/static/css/app.css" rel="stylesheet"/>
+  <link href="/static/css/bootstrap.css" rel="stylesheet"/>
+  <link rel="shortcut icon" href="/static/favicon.ico"/>
+  <script src="/static/lib/moment.min.js"></script>
+  <script src="/static/lib/jquery/jquery-2.1.1.min.js"></script>
+  <script src="/static/lib/bootstrap/bootstrap.min.js"></script>
+  <script src="/static/lib/angular/angular.min.js"></script>
+  <script src="/static/lib/angular-route/angular-route.min.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/search.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12 col-sm-offset-3">
+      <a class="nolink" href="/search/">
+        <span class="title">couchbase intrapop search</span>
+      </a>
+    </div>
+  </deiv>
+  <div class="row">
+    <div class="col-sm-12 main">
+      <div ng-view></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
