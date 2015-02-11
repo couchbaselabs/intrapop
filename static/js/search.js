@@ -2,14 +2,9 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $log.log("in search control");
 
   $scope.maxPagesToShow = 5;
-  $scope.resultsPerPage = 10;
+  $scope.resultsPerPage = 20;
   $scope.page = 1;
   $scope.filters = {};
-
-  $http.get('/api/lastUpdated').
-    success(function(data) {
-      $scope.lastUpdated = data.last_updated;
-    });
 
   $scope.updateSyntax = function() {
     $scope.page = 1;
@@ -81,6 +76,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     for(var key in $scope.filters) {
       conjuncts.push($scope.filters[key]);
     }
+
     $http.post('/api/search', {
       "size": $scope.resultsPerPage,
       "from": from,
@@ -92,9 +88,17 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         "conjuncts": conjuncts
       },
       "facets": {
-        "Categories": {
-          "field": "category",
-          "size": 5
+        "Types": {
+          "field": "Type",
+          "size": 3 // github/commit, confluence/page, beer-sample.
+        },
+        "Authors": {
+          "field": "Author",
+          "size": 50
+        },
+        "RepoNames": {
+          "field": "RepoName",
+          "size": 200
         },
         "Day": {
           "field": "start",
@@ -130,7 +134,32 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           ]
         }
       },
-      "fields": ["summary","description","speaker", "location","duration","start","url"]
+      "fields": [
+          "Type",
+          "Id",
+
+          "URL",
+          "Author",
+          "Date",
+          "Message",
+
+          "Key",
+          "Title",
+          "SpaceKey",
+          "CreatorName",
+          "CreationDate",
+          "LastModifierName",
+          "LastModifierDate",
+          "BodyContent",
+
+          "name",
+          "description",
+          "type",
+          "updated",
+
+          "city", "state", "country", "phone", "website", "address",
+          "abv", "ibu", "srm", "upc", "style", "category"
+      ]
     }).
     success(function(data) {
       $log.log("process results");
@@ -257,6 +286,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         hit.roundedScore = $scope.roundScore(hit.score);
         hit.explanationString = $scope.expl(hit.explanation);
         hit.explanationStringSafe = $sce.trustAsHtml(hit.explanationString);
+
         for(var ff in hit.fragments) {
           fragments = hit.fragments[ff];
           newFragments = [];
@@ -267,10 +297,12 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           }
           hit.fragments[ff] = newFragments;
         }
-        hit.speaker_linkname = hit.fields.speaker;
-        hit.speaker_linkname =hit.speaker_linkname.toLowerCase();
-        hit.speaker_linkname = hit.speaker_linkname.replace(" ", "_");
+
+        hit.url = hit.fields.URL || hit.fields.Key;
+        hit.url = hit.url.toLowerCase();
+        hit.url = hit.url.replace(" ", "_");
     }
+
     $scope.results.roundTook = $scope.roundTook(data.took);
   };
 

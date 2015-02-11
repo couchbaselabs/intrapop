@@ -4,25 +4,28 @@
 </h5>
 
 <!--
-<div class="pull-right"><input type="checkbox" ng-model="explainScoring">Explain Scoring</div>
+<div class="pull-right">
+  <input type="checkbox" ng-model="explainScoring">Explain Scoring
+</div>
 -->
 
 <div class="col-md-8">
   <div ng-repeat="hit in results.hits">
-    <b>
-      <a class="resultLink" href="{{hit.fields.url}}">{{hit.fields.summary}}</a>
-    </b>
+    <a class="resultLink" href="{{hit.url}}">{{hit.url}}</a>
 
     <span class="badgeScore pull-right">{{hit.roundedScore}}</span>
 
     <div class="panel panel-default">
       <div class="panel-heading">
-        <a href="https://source.org/2015/schedule/speaker/{{hit.speaker_linkname}}">
-          <b>{{hit.fields.speaker}}</b>
-        </a>
+        <a href="{{hit.url}}">{{hit.url}}</a>
+        {{hit.fields.Type}}
+        {{hit.fields.Author}}
+        {{hit.fields.CreatorName}}
+        <!--
         on {{hit.fields.start | fmtDay}}
         at {{hit.fields.start | fmtTime}}
         ({{hit.fields.duration}} min) in {{hit.fields.location}}
+        -->
       </div>
 
       <div class="panel-body">
@@ -33,11 +36,12 @@
     </div>
 
     <div class="well" ng-show="explainScoring">
-        Explanation
-        <ul><li><span ng-bind-html="hit.explanationStringSafe"></span></li></ul>
+      Explanation
+      <ul><li><span ng-bind-html="hit.explanationStringSafe"></span></li></ul>
     </div>
   </div>
 </div>
+
 <div class="col-md-3 col-md-offset-1">
   <h3>Refine Results</h3>
   <div ng-repeat="(facetName, facetDetails) in results.facets" class="panel panel-default">
@@ -45,26 +49,26 @@
     <div class="panel-body">
       <div ng-repeat="term in facetDetails.terms" class="checkbox">
         <label>
-        <input type="checkbox" value=""
-               data-ng-checked="checkFilter(facetDetails.field)"
-               ng-click="filterTerm(term.term)">
-        {{term.term}} ({{term.count}})
+          <input type="checkbox" value=""
+                 data-ng-checked="checkFilter(facetDetails.field)"
+                 ng-click="filterTerm(term.term)">
+          {{term.term}} ({{term.count}})
         </label>
       </div>
       <div ng-repeat="dr in facetDetails.date_ranges" class="checkbox">
         <label>
-        <input type="checkbox" value=""
-               data-ng-checked="checkFilter(facetDetails.field)"
-               ng-click="filterDate(dr.name)">
-        {{dr.name}} ({{dr.count}})
+          <input type="checkbox" value=""
+                 data-ng-checked="checkFilter(facetDetails.field)"
+                 ng-click="filterDate(dr.name)">
+          {{dr.name}} ({{dr.count}})
         </label>
       </div>
       <div ng-repeat="nr in facetDetails.numeric_ranges" class="checkbox">
         <label>
-        <input type="checkbox" value=""
-               data-ng-checked="checkFilter(facetDetails.field)"
-               ng-click="filterNumber(nr.name)">
-        {{nr.name}} ({{nr.count}})
+          <input type="checkbox" value=""
+                 data-ng-checked="checkFilter(facetDetails.field)"
+                 ng-click="filterNumber(nr.name)">
+          {{nr.name}} ({{nr.count}})
         </label>
       </div>
     </div>
