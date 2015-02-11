@@ -80,8 +80,6 @@ func buildMapping() *bleve.IndexMapping {
 
 	mapping := bleve.NewIndexMapping()
 	mapping.TypeField = "type"
-	mapping.DefaultMapping = m
-	mapping.DefaultAnalyzer = "en"
 
 	// From github/commit...
 	m = bleve.NewDocumentMapping()

@@ -2,7 +2,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $log.log("in search control");
 
   $scope.maxPagesToShow = 5;
-  $scope.resultsPerPage = 20;
+  $scope.resultsPerPage = 50;
   $scope.page = 1;
   $scope.filters = {};
 
@@ -88,16 +88,16 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         "conjuncts": conjuncts
       },
       "facets": {
-        "Types": {
-          "field": "Type",
-          "size": 3 // github/commit, confluence/page, beer-sample.
+        "types": {
+          "field": "type", // Ex: "github/commit", "confluence/page", etc.
+          "size": 30
         },
-        "Authors": {
-          "field": "Author",
+        "authors": {
+          "field": "author",
           "size": 50
         },
-        "RepoNames": {
-          "field": "RepoName",
+        "repos": {
+          "field": "repo",
           "size": 200
         },
         "Day": {
@@ -134,32 +134,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           ]
         }
       },
-      "fields": [
-          "Type",
-          "Id",
-
-          "URL",
-          "Author",
-          "Date",
-          "Message",
-
-          "Key",
-          "Title",
-          "SpaceKey",
-          "CreatorName",
-          "CreationDate",
-          "LastModifierName",
-          "LastModifierDate",
-          "BodyContent",
-
-          "name",
-          "description",
-          "type",
-          "updated",
-
-          "city", "state", "country", "phone", "website", "address",
-          "abv", "ibu", "srm", "upc", "style", "category"
-      ]
+      "fields": ["*"]
     }).
     success(function(data) {
       $log.log("process results");
@@ -298,9 +273,10 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           hit.fragments[ff] = newFragments;
         }
 
-        hit.url = hit.fields.URL || hit.fields.Key;
-        hit.url = hit.url.toLowerCase();
-        hit.url = hit.url.replace(" ", "_");
+        hit.url = hit.fields.url || hit.fields.key;
+        if (hit.fields.message) {
+            hit.title = hit.fields.message.split("\n")[0]
+        }
     }
 
     $scope.results.roundTook = $scope.roundTook(data.took);

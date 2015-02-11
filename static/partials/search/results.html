@@ -11,21 +11,22 @@
 
 <div class="col-md-8">
   <div ng-repeat="hit in results.hits">
-    <a class="resultLink" href="{{hit.url}}">{{hit.url}}</a>
+    <a class="resultLink" href="{{hit.url}}">
+      {{hit.fields.name}}
+      {{hit.fields.title}}
+      {{hit.title}}
+    </a>
 
     <span class="badgeScore pull-right">{{hit.roundedScore}}</span>
+    <span class="badgeScore pull-right">{{hit.fields.type}}</span>
 
     <div class="panel panel-default">
       <div class="panel-heading">
         <a href="{{hit.url}}">{{hit.url}}</a>
-        {{hit.fields.Type}}
-        {{hit.fields.Author}}
-        {{hit.fields.CreatorName}}
-        <!--
-        on {{hit.fields.start | fmtDay}}
-        at {{hit.fields.start | fmtTime}}
-        ({{hit.fields.duration}} min) in {{hit.fields.location}}
-        -->
+        {{hit.fields.author}}
+        {{hit.fields.creatorName}}
+        {{hit.fields.name}}
+        <pre>{{hit.fields.title}}{{hit.fields.message}}{{hit.fields.bodyContent}}</pre>
       </div>
 
       <div class="panel-body">
