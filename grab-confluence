@@ -63,16 +63,16 @@ def populate_mc(mc, fname, entities_xml)
 
     key = "confluence/" + page_title
     doc = {
-      "Type" => "confluence/page",
-      "Key" => key,
-      "Title" => page_title,
-      "Id" => page_id,
-      "SpaceKey" => space_key,
-      "CreatorName" => creatorName,
-      "CreationDate" => creationDate,
-      "LastModifierName" => lastModifierName,
-      "LastModificationDate" => lastModificationDate,
-      "BodyContent" => bodyContent
+      "type" => "confluence/page",
+      "key" => key,
+      "title" => page_title,
+      "id" => page_id,
+      "spaceKey" => space_key,
+      "creatorName" => creatorName,
+      "creationDate" => creationDate,
+      "lastModifierName" => lastModifierName,
+      "lastModificationDate" => lastModificationDate,
+      "bodyContent" => bodyContent
     }
 
     ok = mc.set(key, doc)
