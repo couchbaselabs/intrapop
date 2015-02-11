@@ -69,8 +69,8 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
   url = CGI.unescape(File.basename(dir)) # Ex: "https://github.com/couchbase/sigar.git".
   print "#{url}\n"
 
-  url_base = url.sub(/\.git$/, '')       # Ex: "https://github.com/couchbase/sigar".
-  repo_name = url_base.sub("https://github.com/", "") # Ex: "couchbase/sigar".
+  url_base = url.sub(/\.git$/, '') # Ex: "https://github.com/couchbase/sigar".
+  repo = url_base.sub("https://github.com/", "") # Ex: "couchbase/sigar".
 
   print "cd #{dir} && git log\n"
   lines = %x"cd #{dir} && git log --date-order --format=fuller --parents"
@@ -83,26 +83,27 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
   commits.each do |commit|
     unless commit.empty?
       key = nil
-      doc = { "Type" => "github/commit", "RepoName" => repo_name }
+      doc = { "type" => "github/commit", "repo" => repo }
 
       hdr, msg = commit.split(/\n\n/)
       fields = hdr.split(/\n/)
       fields.each do |field_val|
         field, val = field_val.split(': ')
         if val
-          # TODO: Do we need to reformat dates?
-          doc[field] = val.strip
+          fieldLowerCamel = field[0].downcase + field[1..-1] # Ex: "commitDate".
+          # TODO: Date formating.
+          doc[fieldLowerCamel] = val.strip
         else
           id, parent_id = field.split(' ')
-          key = repo_name + '/' + id
-          doc["Key"] = key
-          doc["Id"] = id
-          doc["URL"] = url_base + '/commit/' + id
-          doc["ParentId"] = parent_id if parent_id
+          key = repo + '/' + id
+          doc["key"] = key
+          doc["id"] = id
+          doc["url"] = url_base + '/commit/' + id
+          doc["parentId"] = parent_id if parent_id
         end
       end
 
-      doc["Message"] = msg.strip
+      doc["message"] = msg.strip
 
       if key
         if full_repopulate
