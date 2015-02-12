@@ -49,22 +49,6 @@
           {{term.term}} ({{term.count}})
         </label>
       </div>
-      <div ng-repeat="dr in facetDetails.date_ranges" class="checkbox">
-        <label>
-          <input type="checkbox" value=""
-                 data-ng-checked="checkFilter(facetDetails.field)"
-                 ng-click="filterDate(dr.name)">
-          {{dr.name}} ({{dr.count}})
-        </label>
-      </div>
-      <div ng-repeat="nr in facetDetails.numeric_ranges" class="checkbox">
-        <label>
-          <input type="checkbox" value=""
-                 data-ng-checked="checkFilter(facetDetails.field)"
-                 ng-click="filterNumber(nr.name)">
-          {{nr.name}} ({{nr.count}})
-        </label>
-      </div>
     </div>
   </div>
 </div>

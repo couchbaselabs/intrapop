@@ -26,50 +26,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
       }
     ];
 
-    catf = $location.search().cat;
-    if (catf !== undefined) {
-      $scope.filters["category"] = {
-        "field": "category",
-        "match_phrase": catf
-      };
-    }
-
-    df = $location.search().df;
-    if (df === 'Saturday') {
-      $scope.filters["start"] = {
-        "field": "start",
-        "end": "2015-02-01T00:00:00Z"
-      };
-    } else if (df === 'Sunday') {
-      $scope.filters["start"] = {
-        "field": "start",
-        "start": "2015-02-01T00:00:00Z"
-      };
-    }
-
-    nf = $location.search().nf;
-    if (nf === '<=30 min') {
-      $scope.filters["duration"] = {
-        "field": "duration",
-        "max": 31
-      };
-    } else if (nf === '30-60 min') {
-      fv = {
-        "conjuncts": []
-      };
-      fv.conjuncts.push({
-        "field": "duration",
-        "min": 31
-      });
-      fv.conjuncts.push({
-        "field": "duration",
-        "max": 61
-      });
-      $scope.filters["duration"] = fv;
-    } else if (nf === '60+ min') {
-      $scope.filters["duration"] = {
-        "field": "duration",
-        "min": 61
+    typef = $location.search().type;
+    if (typef !== undefined) {
+      $scope.filters["type"] = {
+        "field": "type",
+        "match_phrase": typef
       };
     }
 
@@ -88,51 +49,18 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         "conjuncts": conjuncts
       },
       "facets": {
-        "types": {
+        "00-types": {
           "field": "type", // Ex: "github/commit", "confluence/page", etc.
           "size": 30
         },
-        "authors": {
-          "field": "author",
-          "size": 50
-        },
-        "repos": {
+        "01-repos": {
           "field": "repo",
           "size": 200
         },
-        "Day": {
-          "field": "start",
-          "size": 2,
-          "date_ranges": [
-            {
-              "name": "Saturday",
-              "end": "2015-02-01T00:00:00Z"
-            },
-            {
-              "name": "Sunday",
-              "start": "2015-02-01T00:00:00Z"
-            }
-          ]
+        "02-authors": {
+          "field": "author",
+          "size": 50
         },
-        "Duration": {
-          "field": "duration",
-          "size": 3,
-          "numeric_ranges": [
-            {
-              "name": "<=30 min",
-              "max": 31
-            },
-            {
-              "name": "30-60 min",
-              "min": 31,
-              "max": 61
-            },
-            {
-              "name": "60+ min",
-              "min": 61
-            }
-          ]
-        }
       },
       "fields": ["*"]
     }).
@@ -213,33 +141,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   };
 
   $scope.filterTerm = function(term) {
-    if('category' in $scope.filters) {
-       delete $scope.filters['category'];
-       $location.search('cat', undefined);
+    if('type' in $scope.filters) {
+       delete $scope.filters['type'];
+       $location.search('type', undefined);
     } else {
-      $location.search('cat', term);
-    }
-    // also go back to page 1
-    $scope.jumpToPage(1, null);
-  };
-
-  $scope.filterDate = function(name) {
-    if('start' in $scope.filters) {
-       delete $scope.filters['start'];
-       $location.search('df', undefined);
-    } else {
-      $location.search('df', name);
-    }
-    // also go back to page 1
-    $scope.jumpToPage(1, null);
-  };
-
-  $scope.filterNumber = function(name) {
-    if('duration' in $scope.filters) {
-       delete $scope.filters['duration'];
-       $location.search('nf', undefined);
-     } else {
-      $location.search('nf', name);
+      $location.search('type', term);
     }
     // also go back to page 1
     $scope.jumpToPage(1, null);
@@ -256,6 +162,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     $scope.errorMessage = null;
     $scope.results = data;
     $scope.setupPager($scope.results);
+
     for(var i in $scope.results.hits) {
         hit = $scope.results.hits[i];
         hit.roundedScore = $scope.roundScore(hit.score);
