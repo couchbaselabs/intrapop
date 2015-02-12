@@ -40,13 +40,13 @@
   <h3>Refine Results</h3>
   <div ng-repeat="(facetName, facetDetails) in results.facets"
        class="panel panel-default">
-    <div class="panel-heading"><b>{{facetName}}</b></div>
+    <div class="panel-heading"><b>{{facetDetails.shortName}}</b></div>
     <div class="panel-body">
       <div ng-repeat="term in facetDetails.terms" class="checkbox">
         <label>
           <input type="checkbox" value=""
                  data-ng-checked="checkFilter(facetDetails.field)"
-                 ng-click="filterTerm(term.term)">
+                 ng-click="filterTerm(facetDetails.field , term.term)">
           {{term.term}} ({{term.count}})
         </label>
       </div>

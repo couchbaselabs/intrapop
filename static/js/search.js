@@ -26,12 +26,14 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
       }
     ];
 
-    typef = $location.search().type;
-    if (typef !== undefined) {
-      $scope.filters["type"] = {
-        "field": "type",
-        "match_phrase": typef
-      };
+    for(var key in $location.search()) {
+      if (key.match(/^filter_/)) {
+        var field = key.split("_")[1];
+        $scope.filters[field] = {
+          "field": field,
+          "match_phrase": $location.search()[key]
+        };
+      }
     }
 
     for(var key in $scope.filters) {
@@ -140,12 +142,13 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     }
   };
 
-  $scope.filterTerm = function(term) {
-    if('type' in $scope.filters) {
-       delete $scope.filters['type'];
-       $location.search('type', undefined);
+  $scope.filterTerm = function(field, term) {
+    console.log(field, term);
+    if(field in $scope.filters) {
+       delete $scope.filters[field];
+       $location.search("filter_" + field, undefined);
     } else {
-      $location.search('type', term);
+      $location.search("filter_" + field, term);
     }
     // also go back to page 1
     $scope.jumpToPage(1, null);
@@ -162,6 +165,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     $scope.errorMessage = null;
     $scope.results = data;
     $scope.setupPager($scope.results);
+
+    for(var facetName in $scope.results.facets) {
+        facet = $scope.results.facets[facetName];
+        facet.shortName = facetName.split("-")[1] || facetName;
+    }
 
     for(var i in $scope.results.hits) {
         hit = $scope.results.hits[i];
