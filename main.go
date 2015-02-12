@@ -100,7 +100,13 @@ func buildMapping() *bleve.IndexMapping {
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("spaceKey", kw)
 	// title, creatorName, creationDate, bodyContent,
-	// lastModifierName, lastModificationDate
+	// lastModifierName, lastModificationDate,
+
+	author := bleve.NewTextFieldMapping() // Alias lastModifierName as author.
+	author.Name = "author"
+	author.Analyzer = "en"
+	m.AddFieldMappingsAt("lastModifierName", author)
+
 	mapping.TypeMapping["confluence/page"] = m
 
 	// From beer-sample/beer...
