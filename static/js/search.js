@@ -272,11 +272,6 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           }
           hit.fragments[ff] = newFragments;
         }
-
-        hit.url = hit.fields.url || hit.fields.key;
-        if (hit.fields.message) {
-            hit.title = hit.fields.message.split("\n")[0]
-        }
     }
 
     $scope.results.roundTook = $scope.roundTook(data.took);
