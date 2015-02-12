@@ -75,6 +75,9 @@ func buildMapping() *bleve.IndexMapping {
 	kw := bleve.NewTextFieldMapping()
 	kw.Analyzer = "keyword"
 
+	simple := bleve.NewTextFieldMapping()
+	en.Analyzer = "simple"
+
 	m := bleve.NewDocumentMapping()
 	m.AddFieldMappingsAt("type", kw)
 
@@ -96,7 +99,7 @@ func buildMapping() *bleve.IndexMapping {
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
 	m.AddFieldMappingsAt("type", kw)
-	m.AddFieldMappingsAt("key", kw)
+	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("spaceKey", kw)
 	// title, creatorName, creationDate, bodyContent,
@@ -104,7 +107,7 @@ func buildMapping() *bleve.IndexMapping {
 
 	author := bleve.NewTextFieldMapping() // Alias lastModifierName as author.
 	author.Name = "author"
-	author.Analyzer = "en"
+	author.Analyzer = "simple"
 	m.AddFieldMappingsAt("lastModifierName", author)
 
 	mapping.TypeMapping["confluence/page"] = m
