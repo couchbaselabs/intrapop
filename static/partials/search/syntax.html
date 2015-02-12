@@ -12,15 +12,19 @@
   </form>
 </div>
 
-<div ng-show="errorMessage" class="alert alert-danger ng-cloak" role="alert"> {{errorMessage}}
+<div ng-show="errorMessage"
+     class="row alert alert-danger ng-cloak" role="alert"> {{errorMessage}}
 </div>
 
-<div ng-show="results.hits.length < 1"
-     ng-include src="'/static/partials/search/noresults.html'"></div>
-<div ng-show="results.hits.length > 0"
-     ng-include src="'/static/partials/search/results.html'"/></div>
+<div class="row">
+  <div ng-show="results.hits.length < 1"
+       ng-include src="'/static/partials/search/noresults.html'"></div>
+  <div ng-show="results.hits.length > 0"
+       ng-include src="'/static/partials/search/results.html'"/></div>
+</div>
 
-<div class="footer text-center">
+<div ng-show="results.hits.length > 0"
+     class="row footer text-center">
   Learn how to build search apps like this with
   <a href="http://blevesearch.com/">bleve</a>
   from the
