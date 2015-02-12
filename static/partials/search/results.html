@@ -10,25 +10,22 @@
 <div class="col-md-8">
   <div ng-repeat="hit in results.hits">
     <div class="row">
+      <span class="badgeScore pull-right">
+        {{hit.fields.type}}
+      </span>
       <a class="resultLink" href="{{hit.fields.url}}">
-        {{hit.fields.title}}
+        {{hit.title}}
         {{hit.fields.name}}
       </a>
-    </div>
-
-    <div class="row">
-      <a href="{{hit.fields.url}}">{{hit.fields.url}}</a>
-      <div class="pull-right">
-        {{hit.fields.author}}
-        &nbsp;
-        <span class="badgeScore" style="background-color: #{{hit.fields.type}};">
-          {{hit.fields.type}}
-        </span>
-      </div>
+      &nbsp;
+      {{hit.fields.author}}
+      &nbsp;
     </div>
 
     <div class="row panel">
-      <pre>{{hit.fields.name}}{{hit.fields.title}}{{hit.fields.message}}{{hit.fields.bodyContent}}</pre>
+      <div ng-repeat="(fieldName, fragments) in hit.fragments">
+        <div ng-repeat="fragment in fragments" ng-bind-html="fragment"></div>
+      </div>
     </div>
   </div>
 </div>

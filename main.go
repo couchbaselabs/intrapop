@@ -92,7 +92,14 @@ func buildMapping() *bleve.IndexMapping {
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("parentId", kw)
 	m.AddFieldMappingsAt("url", kw)
-	// author, authorDate, commit, commitDate, message
+
+	authorFacet := bleve.NewTextFieldMapping()
+	authorFacet.Name = "authorFacet"
+	authorFacet.Analyzer = "keyword"
+	authorFacet.IncludeInAll = false
+	m.AddFieldMappingsAt("author", en, authorFacet)
+
+	// authorDate, commit, commitDate, message
 	mapping.TypeMapping["github/commit"] = m
 
 	// From confluence/page...
@@ -102,14 +109,19 @@ func buildMapping() *bleve.IndexMapping {
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("spaceKey", kw)
-	// title, creatorName, creationDate, bodyContent,
-	// lastModifierName, lastModificationDate,
 
 	author := bleve.NewTextFieldMapping() // Alias lastModifierName as author.
 	author.Name = "author"
 	author.Analyzer = "simple"
-	m.AddFieldMappingsAt("lastModifierName", author)
 
+	authorFacet = bleve.NewTextFieldMapping()
+	authorFacet.Name = "authorFacet"
+	authorFacet.Analyzer = "keyword"
+	authorFacet.IncludeInAll = false
+	m.AddFieldMappingsAt("lastModifierName", author, authorFacet)
+
+	// title, creatorName, creationDate, bodyContent,
+	// lastModificationDate,
 	mapping.TypeMapping["confluence/page"] = m
 
 	// From beer-sample/beer...

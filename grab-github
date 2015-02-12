@@ -105,7 +105,6 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
 
       doc["repo"] = repo
       doc["message"] = msg.strip
-      doc["title"] = doc["message"].split("\n")[0]
 
       if key
         if full_repopulate

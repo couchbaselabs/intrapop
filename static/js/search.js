@@ -29,9 +29,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     for(var key in $location.search()) {
       if (key.match(/^filter_/)) {
         var field = key.split("_")[1];
+        var term = $location.search()[key];
+        console.log("field and term:", field, term);
         $scope.filters[field] = {
           "field": field,
-          "match_phrase": $location.search()[key]
+          "match_phrase": term,
         };
       }
     }
@@ -44,9 +46,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
       "size": $scope.resultsPerPage,
       "from": from,
       "explain": true,
-      "highlight":{
-        "fields": ["description"],
-      },
+      "highlight": {},
       "query":  {
         "conjuncts": conjuncts
       },
@@ -60,11 +60,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
           "size": 200
         },
         "02-authors": {
-          "field": "author",
+          "field": "authorFacet",
           "size": 50
         },
       },
-      "fields": ["*"]
+      "fields": ["*"],
     }).
     success(function(data) {
       $log.log("process results");
@@ -148,7 +148,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
        delete $scope.filters[field];
        $location.search("filter_" + field, undefined);
     } else {
-      $location.search("filter_" + field, term);
+       $location.search("filter_" + field, term);
     }
     // also go back to page 1
     $scope.jumpToPage(1, null);
@@ -187,6 +187,11 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         hit.roundedScore = $scope.roundScore(hit.score);
         hit.explanationString = $scope.expl(hit.explanation);
         hit.explanationStringSafe = $sce.trustAsHtml(hit.explanationString);
+
+        hit.title = hit.fields.title;
+        if (!hit.title && hit.fields.message) {
+            hit.title = hit.fields.message.split("\n")[0];
+        }
 
         for(var ff in hit.fragments) {
           fragments = hit.fragments[ff];
