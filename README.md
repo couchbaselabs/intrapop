@@ -28,6 +28,7 @@ To search couchbase codebases via opengrok, try: http://src.couchbase.org/source
 Need ports 8091 and 9090 opened...
 
     iptables -I INPUT 1 -p tcp --dport 8091 -j ACCEPT
+    iptables -I INPUT 1 -p tcp --dport 8099 -j ACCEPT
     iptables -I INPUT 1 -p tcp --dport 9090 -j ACCEPT
 
 And, at least ruby 1.9.3...

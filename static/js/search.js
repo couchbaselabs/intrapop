@@ -169,15 +169,17 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     for(var facetName in $scope.results.facets) {
       facet = $scope.results.facets[facetName];
       facet.shortName = facetName.split("-")[1] || facetName;
-      facet.terms.sort(function(a, b) {
-        if (a.count != b.count) {
-          return b.count - a.count;
-        }
-        if (a.term == b.term) {
-          return 0;
-        }
-        return a.term < b.term ? -1 : 1;
-      });
+      if (facet.terms) {
+        facet.terms.sort(function(a, b) {
+          if (a.count != b.count) {
+            return b.count - a.count;
+          }
+          if (a.term == b.term) {
+            return 0;
+          }
+          return a.term < b.term ? -1 : 1;
+        });
+      }
     }
 
     for(var i in $scope.results.hits) {
