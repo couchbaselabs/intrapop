@@ -65,8 +65,9 @@ def populate_mc(mc, fname, entities_xml)
     doc = {
       "type" => "confluence/page",
       "key" => key,
-      "title" => page_title,
       "id" => page_id,
+      "url" => "http://hub.internal.couchbase.com/confluence/display/#{space_key}/#{page_title}",
+      "title" => page_title,
       "spaceKey" => space_key,
       "creatorName" => creatorName,
       "creationDate" => creationDate,
