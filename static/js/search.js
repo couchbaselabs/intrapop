@@ -48,7 +48,6 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
       if (key.match(/^filter_/)) {
         var field = key.split("_")[1];
         var term = $location.search()[key];
-        console.log("field and term:", field, term);
         $scope.filters[field] = {
           "field": field,
           "match_phrase": term,
@@ -212,7 +211,6 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
 
         var hitFragments = {};
         for(var ff in hit.fragments) {
-          console.log("ff", ff);
           if (ff != "title" && ff != "author" && !$scope.filters[ff]) {
             fragments = hit.fragments[ff];
             newFragments = [];
