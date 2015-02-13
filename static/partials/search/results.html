@@ -15,11 +15,8 @@
       </span>
       <a class="resultLink" href="{{hit.fields.url}}">
         {{hit.title}}
-        {{hit.fields.name}}
       </a>
-      &nbsp;
-      {{hit.fields.author}}
-      &nbsp;
+      <span class="author">by {{hit.fields.author}}&nbsp;</span>
     </div>
 
     <div class="row panel">
@@ -51,6 +48,9 @@
 
 <style>
 .refine {
+  white-space: nowrap;
+}
+.author {
   white-space: nowrap;
 }
 </style>

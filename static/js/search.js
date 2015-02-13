@@ -188,21 +188,26 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         hit.explanationString = $scope.expl(hit.explanation);
         hit.explanationStringSafe = $sce.trustAsHtml(hit.explanationString);
 
-        hit.title = hit.fields.title;
+        hit.title = hit.fields.title || hit.fields.name;
         if (!hit.title && hit.fields.message) {
             hit.title = hit.fields.message.split("\n")[0];
         }
 
+        var hitFragments = {};
         for(var ff in hit.fragments) {
-          fragments = hit.fragments[ff];
-          newFragments = [];
-          for(var ffi in fragments) {
-            fragment = fragments[ffi];
-            safeFragment = $sce.trustAsHtml(fragment);
-            newFragments.push(safeFragment);
+          console.log("ff", ff);
+          if (ff != "title" && ff != "author") {
+            fragments = hit.fragments[ff];
+            newFragments = [];
+            for(var ffi in fragments) {
+              fragment = fragments[ffi];
+              safeFragment = $sce.trustAsHtml(fragment);
+              newFragments.push(safeFragment);
+            }
+            hitFragments[ff] = newFragments;
           }
-          hit.fragments[ff] = newFragments;
         }
+        hit.fragments = hitFragments;
     }
 
     $scope.results.roundTook = $scope.roundTook(data.took);
