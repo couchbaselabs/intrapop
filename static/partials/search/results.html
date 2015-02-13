@@ -30,7 +30,7 @@
   </div>
 </div>
 
-<div class="col-md-3 col-md-offset-1">
+<div class="col-md-3 col-md-offset-1 refine">
   <h3>Refine Results</h3>
   <div ng-repeat="(facetName, facetDetails) in results.facets">
     <div ng-show="facetDetails.terms.length > 0" class="panel panel-default">
@@ -48,6 +48,12 @@
     </div>
   </div>
 </div>
+
+<style>
+.refine {
+  white-space: nowrap;
+}
+</style>
 
 </div>
 
