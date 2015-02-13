@@ -17,7 +17,8 @@
       <a class="resultLink" href="{{hit.fields.url}}">
         {{hit.title}}
       </a>
-      <span class="author">by {{hit.fields.author}}&nbsp;</span>
+      <span ng-show="hit.fields.author"
+            class="author">by {{hit.fields.author}}&nbsp;</span>
     </div>
 
     <div class="row panel">
