@@ -3,16 +3,19 @@ database with JSON data from some "intranet" systems.
 
 Some of these intranet systems are actually out on the internet.
 
-TODO list of possible systems to integrate...
+Current datasources...
 
 * git commit messages
-* gerrit
+* confluence (wiki)
+
+TODO list of possible systems to integrate...
+
 * jira
 * techdocs
 * blogs & CMS
-* confluence (wiki)
 * dropbox
 * yammer
+* gerrit
 * couchbase's twitter/social-media streams
 * CRM / support tickets
 * email groups
