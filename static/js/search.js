@@ -10,6 +10,10 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $scope.page = 1;
   $scope.filters = {};
 
+  if (document.getElementById("srch-term")) {
+    document.getElementById("srch-term").focus();
+  }
+
   $scope.updateSyntax = function() {
     $scope.page = 1;
     $scope.filters = {};
