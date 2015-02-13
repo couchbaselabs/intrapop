@@ -1,5 +1,6 @@
 var typeColors = {
-  "github/commit": "#428bca;"
+  "github/commit": "#428bca;",
+  "github/text": "#42caca;",
 };
 
 function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
