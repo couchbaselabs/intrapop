@@ -31,9 +31,10 @@
 <div class="col-md-3 col-md-offset-1 refine">
   <h3>Refine Results</h3>
   <div ng-repeat="(facetName, facetDetails) in results.facets">
-    <div ng-show="facetDetails.terms.length > 0" class="panel panel-default">
-      <div class="panel-heading"><b>{{facetDetails.shortName}}</b></div>
-      <div class="panel-body">
+    <div ng-show="facetDetails.terms.length > 0"
+         class="panel">
+      <div><b>{{facetDetails.shortName}}</b></div>
+      <div>
         <div ng-repeat="term in facetDetails.terms" class="checkbox">
           <label>
             <input type="checkbox" value=""
@@ -50,6 +51,9 @@
 <style>
 .refine {
   white-space: nowrap;
+}
+.refine h3 {
+  padding-bottom: 15px;
 }
 .author {
   white-space: nowrap;
