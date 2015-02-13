@@ -9,6 +9,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $scope.resultsPerPage = 50;
   $scope.page = 1;
   $scope.filters = {};
+  $scope.searching = false;
 
   if (document.getElementById("srch-term")) {
     document.getElementById("srch-term").focus();
@@ -58,6 +59,9 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     for(var key in $scope.filters) {
       conjuncts.push($scope.filters[key]);
     }
+
+    $scope.searching = true;
+    $scope.lastSyntax = $scope.syntax;
 
     $http.post('/api/search', {
       "size": $scope.resultsPerPage,

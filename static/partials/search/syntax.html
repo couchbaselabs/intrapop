@@ -17,6 +17,9 @@
 </div>
 
 <div class="row">
+  <div ng-show="searching && !results" class="text-center">
+    ...searching...
+  </div>
   <div ng-show="results.hits.length < 1"
        ng-include src="'/static/partials/search/noresults.html'"></div>
   <div ng-show="results.hits.length > 0"
