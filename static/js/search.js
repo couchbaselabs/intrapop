@@ -1,3 +1,7 @@
+var typeColors = {
+  "github/commit": "#428bca;"
+};
+
 function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $log.log("in search control");
 
@@ -222,4 +226,8 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     $log.log("doing jump");
     $location.search('p', $scope.page);
   };
+
+  $scope.typeColor = function(t) {
+      return typeColors[t];
+  }
 }

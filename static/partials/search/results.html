@@ -10,7 +10,8 @@
 <div class="col-md-8">
   <div ng-repeat="hit in results.hits">
     <div class="row">
-      <span class="badgeScore pull-right">
+      <span class="badgeType pull-right"
+            style="background-color: {{typeColor(hit.fields.type)}};">
         {{hit.fields.type}}
       </span>
       <a class="resultLink" href="{{hit.fields.url}}">
