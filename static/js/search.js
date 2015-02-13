@@ -12,6 +12,12 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
 
   $scope.updateSyntax = function() {
     $scope.page = 1;
+    $scope.filters = {};
+    for(var key in $location.search()) {
+      if (key.match(/^filter_/)) {
+        $location.search(key, undefined);
+      }
+    }
     $location.search('q', $scope.syntax);
     $location.search('p', $scope.page);
   };
@@ -124,7 +130,6 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
     for (i = 1; i <= $scope.numPages; i++) {
       $scope.validPages.push(i);
     }
-
 
     // now see if we have too many pages
     if ($scope.validPages.length > $scope.maxPagesToShow) {
