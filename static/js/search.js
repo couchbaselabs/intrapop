@@ -200,7 +200,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
         var hitFragments = {};
         for(var ff in hit.fragments) {
           console.log("ff", ff);
-          if (ff != "title" && ff != "author") {
+          if (ff != "title" && ff != "author" && !$scope.filters[ff]) {
             fragments = hit.fragments[ff];
             newFragments = [];
             for(var ffi in fragments) {
