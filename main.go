@@ -84,10 +84,12 @@ func buildMapping() *bleve.IndexMapping {
 	mapping := bleve.NewIndexMapping()
 	mapping.TypeField = "type"
 
+	// ------------------------------------------------------
 	// From github/commit...
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
 	m.AddFieldMappingsAt("type", kw)
+	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("parentId", kw)
@@ -99,9 +101,23 @@ func buildMapping() *bleve.IndexMapping {
 	authorFacet.IncludeInAll = false
 	m.AddFieldMappingsAt("author", en, authorFacet)
 
-	// authorDate, commit, commitDate, message
+	// Others: authorDate, commit, commitDate, message.
 	mapping.TypeMapping["github/commit"] = m
 
+	// ------------------------------------------------------
+	// From github/text...
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
+	m.AddFieldMappingsAt("type", kw)
+	m.AddFieldMappingsAt("key", simple)
+	m.AddFieldMappingsAt("repo", kw)
+	m.AddFieldMappingsAt("url", kw)
+	m.AddFieldMappingsAt("ext", kw)
+
+	// Otehrs: title, contents.
+	mapping.TypeMapping["github/text"] = m
+
+	// ------------------------------------------------------
 	// From confluence/page...
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
@@ -120,10 +136,11 @@ func buildMapping() *bleve.IndexMapping {
 	authorFacet.IncludeInAll = false
 	m.AddFieldMappingsAt("lastModifierName", author, authorFacet)
 
-	// title, creatorName, creationDate, bodyContent,
-	// lastModificationDate,
+	// Others: title, creatorName, creationDate,
+	// lastModificationDate, bodyContent.
 	mapping.TypeMapping["confluence/page"] = m
 
+	// ------------------------------------------------------
 	// From beer-sample/beer...
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
@@ -133,16 +150,19 @@ func buildMapping() *bleve.IndexMapping {
 	m.AddFieldMappingsAt("srm", kw)
 	m.AddFieldMappingsAt("upc", kw)
 	m.AddFieldMappingsAt("brewery_id", kw)
-	// name, description, updated, style, category
+
+	// Others: name, description, updated, style, category.
 	mapping.TypeMapping["beer"] = m
 
+	// ------------------------------------------------------
 	// From beer-sample/brewery...
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
 	m.AddFieldMappingsAt("type", kw)
-	// name, description, updated
+
+	// Others: name, description, updated
 	// city, state, country, phone, website, address
-	// geo / accuracy, lat, lon
+	// geo / accuracy, lat, lon.
 	mapping.TypeMapping["brewery"] = m
 
 	return mapping

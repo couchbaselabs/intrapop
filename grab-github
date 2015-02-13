@@ -65,7 +65,7 @@ end
 
 # -----------------------------------------------------------------------------
 
-def populate_mc_from_dir(mc, dir, full_repopulate)
+def populate_commits_from_dir(mc, dir, full_repopulate)
   url = CGI.unescape(File.basename(dir)) # Ex: "https://github.com/couchbase/sigar.git".
   print "#{url}\n"
 
@@ -124,13 +124,56 @@ def populate_mc_from_dir(mc, dir, full_repopulate)
   return commits.length, i, nil
 end
 
+def populate_texts_from_dir(mc, dir)
+  url = CGI.unescape(File.basename(dir)) # Ex: "https://github.com/couchbase/sigar.git".
+  url_base = url.sub(/\.git$/, '') # Ex: "https://github.com/couchbase/sigar".
+  repo = url_base.sub("https://github.com/", "") # Ex: "couchbase/sigar".
+
+  text_paths = Dir.glob(dir + "/**/*").select do |path|
+    x = File.basename(path)
+    File.file?(path) and
+      (x =~ /^README/i or x =~ /^TODO/i or
+       x =~ /\.txt$/i or x =~ /\.text$/i or
+       x =~ /\.md$/i or x =~ /\.markdown$/i) and
+      (not x =~ /CMakeLists/)
+  end
+
+  i = 0
+  text_paths.each do |text_path|
+    rel_path = text_path[dir.length..-1][1..-1]
+    key = repo + "/" + rel_path
+    doc = {
+      "type" => "github/text",
+      "repo" => repo,
+      "key" => key,
+      "url" => url_base + "/blob/master/" + rel_path,
+      "ext" => File.extname(text_path),
+      "title" => rel_path,
+      "contents" => File.read(text_path),
+    }
+
+    ok = mc.set(key, doc)
+    if not ok
+      return text_paths.length, i # Return the key that already exists.
+    end
+
+    i = i + 1
+  end
+
+  return text_paths.length, i
+end
+
 # For each repository, grab the commit logs and populate into mc.
 
 mc = Dalli::Client.new(mc_addr, :serializer => JSON)
 
 Dir.glob("./data/github/*") do |dir|
-  commits_total, commits_added, stopped_on_commit = populate_mc_from_dir(mc, dir, full_repopulate)
+  commits_total, commits_added, stopped_on_commit = populate_commits_from_dir(mc, dir, full_repopulate)
   print "  commits_total: #{commits_total}\n"
   print "  commits_added: #{commits_added}\n"
   print "  stopped_on_commit: #{stopped_on_commit}\n"
+
+  texts_total, texts_set = populate_texts_from_dir(mc, dir)
+  print "  texts_total: #{texts_total}\n"
+  print "  texts_set: #{texts_set}\n"
 end
