@@ -32,6 +32,10 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
 
     $scope.numPages = 0;
     $scope.results = null;
+    if (!$scope.syntax) {
+      return;
+    }
+
     from = ($scope.page-1)*$scope.resultsPerPage;
     conjuncts = [
       {
