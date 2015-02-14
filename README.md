@@ -5,8 +5,10 @@ Some of these intranet systems are actually out on the internet.
 
 Current datasources...
 
-* git commit messages
-* confluence (wiki)
+* git commit messages.
+* text files (README's, *.txt, *.md) in github repo's.
+* confluence (wiki) pages.
+* beer & brewery information.
 
 TODO list of possible systems to integrate...
 
@@ -19,7 +21,6 @@ TODO list of possible systems to integrate...
 * couchbase's twitter/social-media streams
 * CRM / support tickets
 * email groups
-* beer information
 * whatever we can get our hands on
 
 = Related links
