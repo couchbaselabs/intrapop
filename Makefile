@@ -1,6 +1,6 @@
-default: intrapop incremental-update
+default: build-intrapop incremental-update
 
-intrapop:
+build-intrapop:
 	go get
 	go build
 
