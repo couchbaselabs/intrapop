@@ -27,6 +27,23 @@
       </div>
     </div>
   </div>
+
+  <div ng-show="numPages > 1" class="text-center">
+    <ul class="pagination">
+      <li ng-show="page > 1"><a
+          ng-click="jumpToPage(page-1, $event)" href="">&laquo;</a>
+      </li>
+      <li ng-repeat="i in validPages"
+          ng-attr-class="{{i == page && 'active' || '' }}">
+        <a ng-show="i != page" href=""
+           ng-click="jumpToPage(i, $event)">{{i}}</a>
+        <span ng-hide="i != page">{{i}}</span>
+      </li>
+      <li><a ng-show="page < numPages"
+             ng-click="jumpToPage(page+1, $event)" href="">&raquo;</a>
+      </li>
+    </ul>
+  </div>
 </div>
 
 <div class="col-md-3 col-md-offset-1 refine">
@@ -64,22 +81,6 @@
 </div>
 
 <div class="row">
-  <div ng-show="numPages > 1" class="text-center">
-    <ul class="pagination">
-      <li ng-show="page > 1"><a
-          ng-click="jumpToPage(page-1, $event)" href="">&laquo;</a>
-      </li>
-      <li ng-repeat="i in validPages"
-          ng-attr-class="{{i == page && 'active' || '' }}">
-        <a ng-show="i != page" href=""
-           ng-click="jumpToPage(i, $event)">{{i}}</a>
-        <span ng-hide="i != page">{{i}}</span>
-      </li>
-      <li><a ng-show="page < numPages"
-             ng-click="jumpToPage(page+1, $event)" href="">&raquo;</a>
-      </li>
-    </ul>
-  </div>
-
+  <hr/>
   <h5 class="text-center">search time: {{searchTime / 1000.0}} secs</h5>
 </div>
