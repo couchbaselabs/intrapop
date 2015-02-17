@@ -11,6 +11,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
   $scope.page = 1;
   $scope.filters = {};
   $scope.searching = false;
+  $scope.searchTime = null;
 
   if (document.getElementById("srch-term")) {
     document.getElementById("srch-term").focus();
@@ -63,6 +64,7 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
 
     $scope.searching = true;
     $scope.lastSyntax = $scope.syntax;
+    $scope.startTime = new Date().getTime();
 
     $http.post('/api/search', {
       "size": $scope.resultsPerPage,
@@ -89,10 +91,14 @@ function SearchCtrl($scope, $http, $routeParams, $log, $sce, $location) {
       "fields": ["*"],
     }).
     success(function(data) {
+      $scope.endTime = new Date().getTime();
+      $scope.searchTime = $scope.endTime - $scope.startTime;
       $log.log("process results");
       $scope.processResults(data);
     }).
     error(function(data, code) {
+      $scope.endTime = new Date().getTime();
+      $scope.searchTime = $scope.endTime - $scope.startTime;
       $scope.errorMessage = data;
     });
     $log.log("done search");
