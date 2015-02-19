@@ -141,6 +141,31 @@ func buildMapping() *bleve.IndexMapping {
 	mapping.TypeMapping["confluence/page"] = m
 
 	// ------------------------------------------------------
+	// From gerrit/change...
+	m = bleve.NewDocumentMapping()
+	m.DefaultAnalyzer = "en"
+	m.AddFieldMappingsAt("type", kw)
+	m.AddFieldMappingsAt("key", simple)
+	m.AddFieldMappingsAt("id", kw)
+	m.AddFieldMappingsAt("project", kw)
+	m.AddFieldMappingsAt("branch", kw)
+	m.AddFieldMappingsAt("change_id", kw)
+	m.AddFieldMappingsAt("status", kw)
+
+	author = bleve.NewTextFieldMapping() // Alias lastModifierName as author.
+	author.Name = "author"
+	author.Analyzer = "simple"
+
+	authorFacet = bleve.NewTextFieldMapping()
+	authorFacet.Name = "authorFacet"
+	authorFacet.Analyzer = "keyword"
+	authorFacet.IncludeInAll = false
+	m.AddFieldMappingsAt("owner", author, authorFacet)
+
+	// Others: title, createdDate, updatedDate.
+	mapping.TypeMapping["gerrit/change"] = m
+
+	// ------------------------------------------------------
 	// From beer-sample/beer...
 	m = bleve.NewDocumentMapping()
 	m.DefaultAnalyzer = "en"
