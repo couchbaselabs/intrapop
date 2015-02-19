@@ -6,4 +6,5 @@ build-intrapop:
 
 incremental-update:
 	./grab-github
+	./grab-gerrit
 	./grab-confluence
