@@ -5,6 +5,6 @@ build-intrapop:
 	go build
 
 incremental-update:
-	./grab-github
 	./grab-gerrit
 	./grab-confluence
+	./grab-github
