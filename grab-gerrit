@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+# Grab data from gerrit and populate the
+# couchbase bucket with the latest updates.
+
+require 'cgi'
+require 'dalli'
+require 'json'
+require 'net/http'
+require 'uri'
+
+args = {}
+ARGV.each do |arg|
+  k, v = arg.split('=')
+  args[k] = v or ""
+end
+
+mc_addr = 'localhost:11211'
+mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
+
+gerrit_url = 'http://review.couchbase.org'
+gerrit_url = args['--gerrit_url'] if args.include?('--gerrit_url')
+
+# -----------------------------------------------------------------------------
+
+mc = Dalli::Client.new(mc_addr, :serializer => JSON)
+
+def populate_mc(mc, gerrit_url, project)
+  print "project: #{project}\n"
+
+  res = Net::HTTP.get(URI(gerrit_url + '/changes/?q=project:' + project))
+  changes = JSON.parse(res.sub(/^\)\]\}\'/, ""))
+
+  changes = changes.sort {|a, b| b["updated"] <=> a["updated"]}
+  if changes.length > 0
+    print "  latest: #{changes[0]['updated']}\n"
+  end
+
+  i = 0
+  changes.each do |change|
+    # Example change...
+    # { "id": "ep-engine~master~If0eec43dc07253fa9c757910bb3ff110512220b3",
+    #   "project": "ep-engine",
+    #   "branch": "master",
+    #   "change_id": "If0eec43dc07253fa9c757910bb3ff110512220b3",
+    #   "subject": "Move ConnMap::notifyVBConnections to TapConnMap.",
+    #   "status": "MERGED",
+    #   "created": "2014-07-10 01:43:16.647000000",
+    #   "updated": "2014-07-10 19:28:19.256000000",
+    #   "insertions": 25,
+    #   "deletions": 25,
+    #   "_sortkey": "002e561000009955",
+    #   "_number": 39253,
+    #   "owner": {
+    #     "name": "Chiyoung Seo"
+    #   }
+    # }
+    key = "gerrit/" + change["id"]
+    doc = {
+      "type" => "gerrit/change",
+      "key" => key,
+      "id" => change["id"],
+      "project" => change["project"],
+      "branch" => change["branch"],
+      "change_id" => change["change_id"],
+      "title" => change["subject"], # Relabeled.
+      "status" => change["status"],
+      "createdDate" => change["created"], # Relabeled.
+      "updatedDate" => change["updated"], # Relabeled.
+      "owner" => change["owner"]["name"], # Relabeled.
+    }
+
+    ok = mc.set(key, doc)
+    if not ok
+      exit "mc.set failed"
+    end
+
+    i = i + 1
+  end
+
+  return changes.length, i
+end
+
+res = Net::HTTP.get(URI(gerrit_url + '/projects/'))
+projects = JSON.parse(res.sub(/^\)\]\}\'/, ""))
+projects.each do |project, project_obj|
+  changes_total, changes_set = populate_mc(mc, gerrit_url, project)
+  print "  changes_total: #{changes_total}\n"
+  print "  changes_set: #{changes_set}\n"
+end
