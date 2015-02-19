@@ -59,6 +59,7 @@ def populate_mc(mc, gerrit_url, project)
     doc = {
       "type" => "gerrit/change",
       "key" => key,
+      "url" => "#{gerrit_url}/#{change['_number']}",
       "id" => change["id"],
       "project" => change["project"],
       "branch" => change["branch"],
