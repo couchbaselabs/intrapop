@@ -44,6 +44,7 @@ And, at least ruby 1.9.3...
     gem install dalli
     gem install octokit
     gem install nokogiri
+    gem install yam
 
 To get leveldb...
 
