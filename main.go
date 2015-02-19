@@ -91,6 +91,7 @@ func buildMapping() *bleve.IndexMapping {
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
+	m.AddFieldMappingsAt("project", kw)
 	m.AddFieldMappingsAt("id", kw)
 	m.AddFieldMappingsAt("parentId", kw)
 	m.AddFieldMappingsAt("url", kw)

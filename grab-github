@@ -145,6 +145,7 @@ def populate_texts_from_dir(mc, dir)
     doc = {
       "type" => "github/text",
       "repo" => repo,
+      "project" => repo.split("/")[-1],
       "key" => key,
       "url" => url_base + "/blob/master/" + rel_path,
       "ext" => File.extname(text_path),
