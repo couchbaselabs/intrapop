@@ -1,0 +1,49 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.3.7)
+    bcrypt (3.1.10)
+    bcrypt-ruby (3.1.5)
+      bcrypt (>= 3.1.3)
+    connection_pool (2.1.1)
+    couchbase (1.3.11)
+      connection_pool (>= 1.0.0, <= 3.0.0)
+      multi_json (~> 1.0)
+      yaji (~> 0.3, >= 0.3.2)
+    dalli (2.7.2)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
+    mime-types (2.4.3)
+    multi_json (1.10.1)
+    multipart-post (2.0.0)
+    netrc (0.10.2)
+    nokogiri (1.6.6.2)
+    oauth2-client (2.0.0)
+      addressable (~> 2.3)
+      bcrypt-ruby (~> 3.0)
+    octokit (3.8.0)
+      sawyer (~> 0.6.0, >= 0.5.3)
+    oj (2.11.4)
+    rest-client (1.7.3)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
+    sawyer (0.6.0)
+      addressable (~> 2.3.5)
+      faraday (~> 0.8, < 0.10)
+    yaji (0.3.5)
+    yam (2.4.1)
+      addressable (~> 2.3)
+      multi_json (~> 1.10)
+      oauth2-client (~> 2.0)
+      oj (~> 2.0)
+      rest-client (~> 1.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  couchbase
+  dalli
+  nokogiri
+  octokit
+  yam

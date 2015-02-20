@@ -4,36 +4,39 @@
 # couchbase bucket with the latest updates.
 
 require 'cgi'
-require 'dalli'
+require 'couchbase'
 require 'json'
 require 'net/http'
 require 'uri'
+require 'optparse'
+require 'stringio'
 
-args = {}
-ARGV.each do |arg|
-  k, v = arg.split('=')
-  args[k] = v or ""
-end
+options = {
+  couchbase: 'http://localhost:8091',
+  gerrit: 'http://review.couchbase.org'
+}
 
-mc_addr = 'localhost:11211'
-mc_addr = args['--mc-addr'] if args.include?('--mc-addr')
-
-gerrit_url = 'http://review.couchbase.org'
-gerrit_url = args['--gerrit_url'] if args.include?('--gerrit_url')
+OptionParser.new do |opts|
+  opts.banner = 'Usage: grab-gerrit [options]'
+  opts.on('-c', '--couchbase=URL', "URL of Couchbase (#{options[:couchbase]})") do |val|
+    options[:couchbase] = val
+  end
+  opts.on('-g', '--gerrit=URL', "URL of Gerrit (#{options[:gerrit]})") do |val|
+    options[:gerrit] = val
+  end
+end.parse!
 
 # -----------------------------------------------------------------------------
 
-mc = Dalli::Client.new(mc_addr, :serializer => JSON)
-
-def populate_mc(mc, gerrit_url, project)
-  print "project: #{project}\n"
+def populate_cb(cb, gerrit_url, project, out)
+  out.puts "project: #{project}"
 
   res = Net::HTTP.get(URI(gerrit_url + '/changes/?q=project:' + project))
-  changes = JSON.parse(res.sub(/^\)\]\}\'/, ""))
+  changes = JSON.parse(res.sub(/^\)\]\}\'/, ''))
 
-  changes = changes.sort {|a, b| b["updated"] <=> a["updated"]}
+  changes = changes.sort { |a, b| b['updated'] <=> a['updated'] }
   if changes.length > 0
-    print "  latest: #{changes[0]['updated']}\n"
+    out.puts "  latest: #{changes[0]['updated']}"
   end
 
   i = 0
@@ -55,37 +58,42 @@ def populate_mc(mc, gerrit_url, project)
     #     "name": "Chiyoung Seo"
     #   }
     # }
-    key = "gerrit/" + change["id"]
+    key = 'gerrit/' + change['id']
     doc = {
-      "type" => "gerrit/change",
-      "key" => key,
-      "url" => "#{gerrit_url}/#{change['_number']}",
-      "id" => change["id"],
-      "project" => change["project"],
-      "branch" => change["branch"],
-      "change_id" => change["change_id"],
-      "title" => change["subject"], # Relabeled.
-      "status" => change["status"],
-      "createdDate" => change["created"], # Relabeled.
-      "updatedDate" => change["updated"], # Relabeled.
-      "owner" => change["owner"]["name"], # Relabeled.
+      type: 'gerrit/change',
+      key: key,
+      url: "#{gerrit_url}/#{change['_number']}",
+      id: change['id'],
+      project: change['project'],
+      branch: change['branch'],
+      change_id: change['change_id'],
+      title: change['subject'], # Relabeled.
+      status: change['status'],
+      createdDate: change['created'], # Relabeled.
+      updatedDate: change['updated'], # Relabeled.
+      owner: change['owner']['name'], # Relabeled.
     }
 
-    ok = mc.set(key, doc)
-    if not ok
-      exit "mc.set failed"
-    end
+    ok = cb.set(key, doc)
+    abort 'cb.set failed' unless ok
 
-    i = i + 1
+    i += 1
   end
 
-  return changes.length, i
+  [changes.length, i]
 end
 
-res = Net::HTTP.get(URI(gerrit_url + '/projects/'))
-projects = JSON.parse(res.sub(/^\)\]\}\'/, ""))
-projects.each do |project, project_obj|
-  changes_total, changes_set = populate_mc(mc, gerrit_url, project)
-  print "  changes_total: #{changes_total}\n"
-  print "  changes_set: #{changes_set}\n"
+res = Net::HTTP.get(URI(options[:gerrit] + '/projects/'))
+projects = JSON.parse(res.sub(/^\)\]\}\'/, ''))
+threads = []
+projects.each do |project, _project_obj|
+  threads << Thread.new do
+    cb = Couchbase.connect(options[:couchbase])
+    out = StringIO.new
+    changes_total, changes_set = populate_cb(cb, options[:gerrit], project, out)
+    out.puts "  changes_total: #{changes_total}"
+    out.puts "  changes_set: #{changes_set}"
+    puts out.string
+  end
 end
+threads.each(&:join)
