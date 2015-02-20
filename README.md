@@ -40,10 +40,8 @@ And, at least ruby 1.9.3...
 
     rvm use 1.9.3 --default
 
-    gem install dalli
-    gem install octokit
-    gem install nokogiri
-    gem install yam
+    gem install bundler
+    bundle install
 
 To get leveldb...
 
