@@ -2,7 +2,7 @@ default: build-intrapop incremental-update
 
 build-intrapop:
 	go get
-	go build
+	go build -tags libstemmer
 
 incremental-update:
 	./grab-gerrit

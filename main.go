@@ -69,8 +69,40 @@ func startServer(index bleve.Index, addr string) {
 }
 
 func buildMapping() *bleve.IndexMapping {
+	mapping := bleve.NewIndexMapping()
+	mapping.TypeField = "type"
+
+	err := mapping.AddCustomTokenFilter("notTooLong",
+		map[string]interface{}{
+			"type":   "truncate_token",
+			"length": 100.0,
+		})
+	if err != nil {
+		panic(err)
+	}
+	err = mapping.AddCustomAnalyzer("enNotTooLong",
+		map[string]interface{}{
+			"type":      "custom",
+			"tokenizer": "unicode",
+			"token_filters": []string{
+				"notTooLong",
+				"possessive_en",
+				"to_lower",
+				"stop_en",
+				"stemmer_en",
+			},
+		})
+	if err != nil {
+		panic(err)
+	}
+
+	mapping.DefaultAnalyzer = "enNotTooLong"
+
 	en := bleve.NewTextFieldMapping()
 	en.Analyzer = "en"
+
+	enNotTooLong := bleve.NewTextFieldMapping()
+	enNotTooLong.Analyzer = "enNotTooLong"
 
 	kw := bleve.NewTextFieldMapping()
 	kw.Analyzer = "keyword"
@@ -81,13 +113,10 @@ func buildMapping() *bleve.IndexMapping {
 	m := bleve.NewDocumentMapping()
 	m.AddFieldMappingsAt("type", kw)
 
-	mapping := bleve.NewIndexMapping()
-	mapping.TypeField = "type"
-
 	// ------------------------------------------------------
 	// From github/commit...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
@@ -108,7 +137,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From github/text...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
@@ -121,7 +150,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From confluence/page...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
@@ -144,7 +173,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From gerrit/change...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
@@ -169,7 +198,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From beer-sample/beer...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("abv", kw)
 	m.AddFieldMappingsAt("ibu", kw)
@@ -183,7 +212,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From beer-sample/brewery...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "en"
+	m.DefaultAnalyzer = "enNotTooLong"
 	m.AddFieldMappingsAt("type", kw)
 
 	// Others: name, description, updated
