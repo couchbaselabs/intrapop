@@ -72,7 +72,23 @@ func buildMapping() *bleve.IndexMapping {
 	mapping := bleve.NewIndexMapping()
 	mapping.TypeField = "type"
 
-	err := mapping.AddCustomTokenFilter("notTooLong",
+	err := mapping.AddCustomTokenMap("stop_mb_map",
+		map[string]interface{}{
+			"type":   "custom",
+			"tokens": []interface{}{"mb"},
+		})
+	if err != nil {
+		panic(err)
+	}
+	err = mapping.AddCustomTokenFilter("stop_mb",
+		map[string]interface{}{
+			"type":           "stop_tokens",
+			"stop_token_map": "stop_mb_map",
+		})
+	if err != nil {
+		panic(err)
+	}
+	err = mapping.AddCustomTokenFilter("notTooLong",
 		map[string]interface{}{
 			"type":   "truncate_token",
 			"length": 100.0,
@@ -89,6 +105,7 @@ func buildMapping() *bleve.IndexMapping {
 				"possessive_en",
 				"to_lower",
 				"stop_en",
+				"stop_mb",
 				"stemmer_en",
 			},
 		})
