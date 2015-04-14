@@ -72,23 +72,7 @@ func buildMapping() *bleve.IndexMapping {
 	mapping := bleve.NewIndexMapping()
 	mapping.TypeField = "type"
 
-	err := mapping.AddCustomTokenMap("stop_mb_map",
-		map[string]interface{}{
-			"type":   "custom",
-			"tokens": []interface{}{"mb"},
-		})
-	if err != nil {
-		panic(err)
-	}
-	err = mapping.AddCustomTokenFilter("stop_mb",
-		map[string]interface{}{
-			"type":           "stop_tokens",
-			"stop_token_map": "stop_mb_map",
-		})
-	if err != nil {
-		panic(err)
-	}
-	err = mapping.AddCustomTokenFilter("notTooLong",
+	err := mapping.AddCustomTokenFilter("notTooLong",
 		map[string]interface{}{
 			"type":   "truncate_token",
 			"length": 100.0,
@@ -96,16 +80,29 @@ func buildMapping() *bleve.IndexMapping {
 	if err != nil {
 		panic(err)
 	}
-	err = mapping.AddCustomAnalyzer("enNotTooLong",
+	err = mapping.AddCustomTokenizer("ticketTokenizer",
+		map[string]interface{}{
+			"type":      "exception",
+			"tokenizer": "unicode",
+			"exceptions": []interface{}{ // Pass through JIRA ticket ID's (MB-11111) as tokens.
+				`MB-\d+`,
+				`CBD-\d+`,
+				`CBIT-\d+`,
+				`CBSE-\d+`,
+			},
+		})
+	if err != nil {
+		panic(err)
+	}
+	err = mapping.AddCustomAnalyzer("enNotTooLongTicketed",
 		map[string]interface{}{
 			"type":      "custom",
-			"tokenizer": "unicode",
+			"tokenizer": "ticketTokenizer",
 			"token_filters": []string{
 				"notTooLong",
 				"possessive_en",
 				"to_lower",
 				"stop_en",
-				"stop_mb",
 				"stemmer_en",
 			},
 		})
@@ -113,13 +110,13 @@ func buildMapping() *bleve.IndexMapping {
 		panic(err)
 	}
 
-	mapping.DefaultAnalyzer = "enNotTooLong"
+	mapping.DefaultAnalyzer = "enNotTooLongTicketed"
 
 	en := bleve.NewTextFieldMapping()
 	en.Analyzer = "en"
 
 	enNotTooLong := bleve.NewTextFieldMapping()
-	enNotTooLong.Analyzer = "enNotTooLong"
+	enNotTooLong.Analyzer = "enNotTooLongTicketed"
 
 	kw := bleve.NewTextFieldMapping()
 	kw.Analyzer = "keyword"
@@ -133,7 +130,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From github/commit...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
@@ -154,7 +151,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From github/text...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("repo", kw)
@@ -167,7 +164,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From confluence/page...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
@@ -190,7 +187,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From gerrit/change...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("key", simple)
 	m.AddFieldMappingsAt("id", kw)
@@ -215,7 +212,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From beer-sample/beer...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 	m.AddFieldMappingsAt("abv", kw)
 	m.AddFieldMappingsAt("ibu", kw)
@@ -229,7 +226,7 @@ func buildMapping() *bleve.IndexMapping {
 	// ------------------------------------------------------
 	// From beer-sample/brewery...
 	m = bleve.NewDocumentMapping()
-	m.DefaultAnalyzer = "enNotTooLong"
+	m.DefaultAnalyzer = "enNotTooLongTicketed"
 	m.AddFieldMappingsAt("type", kw)
 
 	// Others: name, description, updated
