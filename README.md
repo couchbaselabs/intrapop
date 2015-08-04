@@ -22,11 +22,11 @@ TODO list of possible systems to integrate...
 * email groups
 * whatever we can get our hands on
 
-= Related links
+# Related links
 
 To search couchbase codebases via opengrok, try: http://src.couchbase.org/source/
 
-= Some ops hints
+# Some ops hints
 
 Need ports 8091 and 9090 opened...
 
