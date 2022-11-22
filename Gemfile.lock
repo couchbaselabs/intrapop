@@ -10,7 +10,7 @@ GEM
       connection_pool (>= 1.0.0, <= 3.0.0)
       multi_json (~> 1.0)
       yaji (~> 0.3, >= 0.3.2)
-    dalli (2.7.2)
+    dalli (3.2.3)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     mime-types (2.4.3)
